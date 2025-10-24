@@ -7,7 +7,9 @@ public class Player {
     private int number;
     private String position;
 
-    public Player(String name, String team, int number, String position) {
+    public Player(){}
+    public Player(int id,String name, String team, int number, String position) {
+        this.id = id;
         this.name = name;
         this.team = team;
         this.number = number;
@@ -44,5 +46,13 @@ public class Player {
 
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

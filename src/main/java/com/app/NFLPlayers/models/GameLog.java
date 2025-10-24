@@ -1,29 +1,38 @@
 package com.app.NFLPlayers.models;
 
-import java.util.Date;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDate;
 
 public class GameLog {
-    private Date date;
+    private LocalDate date;
     private int playerId;
+    private int teamId;
     private String opponent;
     private double passingYds;
     private double receivingYds;
     private double rushingYds;
 
-    public GameLog(double rushingYds, double receivingYds, double passingYds, String opponent, int playerId, Date date) {
+    public GameLog() {}
+    public GameLog(double rushingYds, double receivingYds, double passingYds, String opponent, int playerId, int teamId, LocalDate date) {
         this.rushingYds = rushingYds;
         this.receivingYds = receivingYds;
         this.passingYds = passingYds;
         this.opponent = opponent;
         this.playerId = playerId;
+        this.teamId = teamId;
         this.date = date;
     }
 
-    public Date getDate() {
+    public void setTeamId(int teamId) {
+        this.teamId = teamId;
+    }
+
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -65,5 +74,9 @@ public class GameLog {
 
     public void setRushingYds(double rushingYds) {
         this.rushingYds = rushingYds;
+    }
+
+    public int getTeamId() {
+        return teamId;
     }
 }
