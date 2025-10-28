@@ -1,10 +1,26 @@
 package com.app.NFLPlayers.models;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name="player_table")
 public class Player {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "player_id")
     private int id;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "team")
     private String team;
+
+    @Column(name = "number")
     private int number;
+
+    @Column(name = "position")
     private String position;
 
     public Player(){}
@@ -46,10 +62,6 @@ public class Player {
 
     public void setPosition(String position) {
         this.position = position;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public void setId(int id) {

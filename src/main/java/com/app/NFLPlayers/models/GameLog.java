@@ -1,7 +1,5 @@
 package com.app.NFLPlayers.models;
 
-import org.springframework.cglib.core.Local;
-
 import java.time.LocalDate;
 
 public class GameLog {
