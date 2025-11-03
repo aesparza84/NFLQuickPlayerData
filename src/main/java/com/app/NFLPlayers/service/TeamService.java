@@ -1,11 +1,13 @@
 package com.app.NFLPlayers.service;
 
+import com.app.NFLPlayers.DTO.TeamDetailsDTO;
 import com.app.NFLPlayers.models.Player;
 import com.app.NFLPlayers.models.Team;
 import com.app.NFLPlayers.repository.TeamRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TeamService {
@@ -16,11 +18,13 @@ public class TeamService {
         this.repo = r;
     }
 
-    public List<Team> getAllTeams(){
-        return repo.findAll();
+    public List<TeamDetailsDTO> getAllTeams(){
+        return repo.findAll().stream()
+                .map(t -> t.ToDetailsDTO())
+                .toList();
     }
 
-    public List<Player> getTeamRoster(){
-        return null;
+    public Optional<Team> getTeamById(int id){
+        return repo.findById(id);
     }
 }

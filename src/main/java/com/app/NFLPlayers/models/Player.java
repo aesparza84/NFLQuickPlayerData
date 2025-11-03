@@ -1,5 +1,6 @@
 package com.app.NFLPlayers.models;
 
+import com.app.NFLPlayers.DTO.PlayerDTO;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,8 +15,9 @@ public class Player {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "team")
-    private String team;
+    @ManyToOne
+    @JoinColumn(name = "team_id", referencedColumnName = "team_id")
+    private Team team;
 
     @Column(name = "number")
     private int number;
@@ -24,7 +26,7 @@ public class Player {
     private String position;
 
     public Player(){}
-    public Player(int id,String name, String team, int number, String position) {
+    public Player(int id,String name, Team team, int number, String position) {
         this.id = id;
         this.name = name;
         this.team = team;
@@ -40,11 +42,11 @@ public class Player {
         this.name = name;
     }
 
-    public String getTeam() {
+    public Team getTeam() {
         return team;
     }
 
-    public void setTeam(String team) {
+    public void setTeam(Team team) {
         this.team = team;
     }
 
@@ -67,4 +69,15 @@ public class Player {
     public void setId(int id) {
         this.id = id;
     }
+
+    public PlayerDTO toDTO()
+    {
+        return new PlayerDTO(
+            this.name,
+            this.team.ToTagDTO(),
+            this.number,
+            this.position
+        );
+    }
+
 }

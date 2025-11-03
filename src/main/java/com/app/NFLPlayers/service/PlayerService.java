@@ -1,10 +1,13 @@
 package com.app.NFLPlayers.service;
 
+import com.app.NFLPlayers.DTO.PlayerDTO;
 import com.app.NFLPlayers.models.Player;
 import org.springframework.stereotype.Service;
 import com.app.NFLPlayers.repository.PlayerRepo;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PlayerService {
@@ -15,11 +18,17 @@ public class PlayerService {
         this.repo = r;
     }
 
-    public List<Player> getPlayers(){
-        return repo.findAll();
+    public List<PlayerDTO> getPlayers(){
+
+        return repo.findAll().stream().map(s -> s.toDTO()).toList();
     }
 
-    public Player getPlayerById(int id){
-        return null;
+    public PlayerDTO getPlayerById(int id){
+        Optional<Player> p = repo.findById(id);
+
+        if (p.isPresent())
+            return p.get().toDTO();
+
+        return new PlayerDTO();
     }
 }
