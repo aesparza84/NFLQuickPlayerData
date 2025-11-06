@@ -2,8 +2,6 @@ package com.app.NFLPlayers.controller;
 
 import com.app.NFLPlayers.DTO.PlayerDTO;
 import com.app.NFLPlayers.DTO.TeamDetailsDTO;
-import com.app.NFLPlayers.models.GameLog;
-import com.app.NFLPlayers.models.Player;
 import com.app.NFLPlayers.models.Team;
 import com.app.NFLPlayers.service.PlayerService;
 import com.app.NFLPlayers.service.TeamService;
@@ -12,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,34 +26,78 @@ public class PlayerLogController {
     }
 
     @GetMapping("/players")
-    public ResponseEntity<ApiResponse<List<PlayerDTO>>> AllPlayers() {
-        List<PlayerDTO> list = playerService.getPlayers();
+    public ResponseEntity<ApiResponse<List<PlayerDTO>>> GetPlayers(@RequestParam(value = "name", required = false) String name,
+                                                                   @RequestParam(value = "number", required = false) Integer number,
+                                                                   @RequestParam(value = "position", required = false) String position) {
+        List<PlayerDTO> list = null;
+        ApiResponse<List<PlayerDTO>> response = null;
 
-        ApiResponse<List<PlayerDTO>> s =new ApiResponse<List<PlayerDTO>>("Success", "Default Message", list);
+        if (name != null){
+            list = playerService.matchPlayersByName(name);
+            response = new ApiResponse<List<PlayerDTO>>("Success", "Matched players on name", list);
+        }
+        else if (number != null){
+            list = playerService.matchPlayersByNumber(number);
+            response = new ApiResponse<List<PlayerDTO>>("Success", "Matched players on number", list);
+        }
+        else if (position != null){
+            list = playerService.matchPlayersByPosition(position);
+            response = new ApiResponse<List<PlayerDTO>>("Success", "Matched players on position", list);
+        }
 
-        return ResponseEntity.status(HttpStatus.OK).body(s);
+        if (list != null)
+        {
+            if (list.isEmpty())
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new ApiResponse<>("Unsuccessful search","No players found",null));
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+        //If no Query-parameters
+        list = playerService.getAllPlayers();
+        response = new ApiResponse<List<PlayerDTO>>("Success", "Default Message", list);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    //RequestParam - Filter through data
+    //PathVariable - Identifies specific resource (id)
 
     @GetMapping("/teams")
-    public ResponseEntity<ApiResponse<List<TeamDetailsDTO>>> AllTeams() {
-        List<TeamDetailsDTO> list = teamService.getAllTeams();
+    public ResponseEntity<ApiResponse<List<TeamDetailsDTO>>> GetTeams(@RequestParam(value = "teamName",required = false) String teamName,
+                                                                      @RequestParam(value = "teamAbbreviation",required = false) String abbrev) {
 
-        ApiResponse<List<TeamDetailsDTO>> s =
-                new ApiResponse<List<TeamDetailsDTO>>("Success", "Default Message", list);
+        List<TeamDetailsDTO> list = null;
+        ApiResponse<List<TeamDetailsDTO>> response = null;
 
-        return ResponseEntity.status(HttpStatus.OK).body(s);
+        if (teamName != null) {
+            list = teamService.matchName(teamName);
+            response = new ApiResponse<List<TeamDetailsDTO>>("Success", "Matched on Name", list);
+        }
+        else if (abbrev != null){
+            list = teamService.matchAbbreviation(abbrev);
+            response = new ApiResponse<List<TeamDetailsDTO>>("Success", "Matched on Abbrev.", list);
+        }
+
+        if (response != null)
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        //If there are no RequestParams
+        list = teamService.getAllTeams();
+        response = new ApiResponse<List<TeamDetailsDTO>>("Success", "Default Message", list);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/team")
-    public ResponseEntity<ApiResponse<Team>> GetTeam(@RequestParam(value = "id", required = true) Integer id) {
+    @GetMapping("/team/{id}")
+    public ResponseEntity<ApiResponse<TeamDetailsDTO>> GetTeamById(@PathVariable(name = "id") Integer id) {
         Optional<Team> team = teamService.getTeamById(id);
 
         if (team.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<Team>("NOT FOUND", "Team not found",null));
+                    .body(new ApiResponse<TeamDetailsDTO>("NOT FOUND", "Team not found",null));
 
         return ResponseEntity.status(HttpStatus.FOUND)
-                .body(new ApiResponse<Team>("Success", "Team found",team.get()));
+                .body(new ApiResponse<TeamDetailsDTO>("Success", "Team found",team.get().ToDetailsDTO()));
     }
 
 
