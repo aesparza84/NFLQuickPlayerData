@@ -1,9 +1,11 @@
 package com.app.NFLPlayers.service;
 
 import com.app.NFLPlayers.DTO.TeamDetailsDTO;
+import com.app.NFLPlayers.DTO.TeamTagDTO;
 import com.app.NFLPlayers.models.Player;
 import com.app.NFLPlayers.models.Team;
 import com.app.NFLPlayers.repository.TeamRepo;
+import com.app.NFLPlayers.utility.GameLogSpecs;
 import com.app.NFLPlayers.utility.TeamSpecs;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -31,40 +33,30 @@ public class TeamService {
         this.repo = r;
     }
 
-    public List<TeamDetailsDTO> getAllTeams(){
+    public List<TeamTagDTO> getAllTeams(){
         return repo.findAll().stream()
-                .map(t -> t.ToDetailsDTO())
+                .map(t -> t.ToTagDTO())
                 .toList();
     }
 
-    public List<TeamDetailsDTO> matchName(String name) {
+    public List<TeamTagDTO> matchName(String name) {
         if (name == null){
-            return new ArrayList<TeamDetailsDTO>();
+            return new ArrayList<TeamTagDTO>();
         }
 
-        return repo.findAllByNameContainsIgnoreCase(name).stream()
-                .map(t -> t.ToDetailsDTO())
-                .toList();
+        Specification<Team> specs = TeamSpecs.matchName(name);
 
-//        Specification<Team> spec = TeamSpecs.matchName(name);
-//        return repo.findAll(spec).stream()
-//                .map(t -> t.ToDetailsDTO())
-//                .toList();
+        return repo.findAll(specs).stream().map(t -> t.ToTagDTO()).toList();
     }
 
-    public List<TeamDetailsDTO> matchAbbreviation(String abbrev) {
+    public List<TeamTagDTO> matchAbbreviation(String abbrev) {
         if (abbrev == null){
-            return new ArrayList<TeamDetailsDTO>();
+            return new ArrayList<TeamTagDTO>();
         }
 
         return repo.findAllByAbbreviationContainsIgnoreCase(abbrev).stream()
-                .map(t -> t.ToDetailsDTO())
+                .map(t -> t.ToTagDTO())
                 .toList();
-
-//        Specification<Team> spec = TeamSpecs.matchAbbreviation(abbrev);
-//        return repo.findAll(spec).stream()
-//                .map(t -> t.ToDetailsDTO())
-//                .toList();
     }
 
     public Optional<Team> getTeamById(int id){

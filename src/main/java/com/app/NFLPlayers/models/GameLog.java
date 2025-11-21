@@ -1,29 +1,50 @@
 package com.app.NFLPlayers.models;
 
+import com.app.NFLPlayers.DTO.GameLogDTO;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
+@Entity
+@IdClass(GameLogId.class)
+@Table(name = "football_main_table")
 public class GameLog {
+    @Id
+    @Column(name = "date")
     private LocalDate date;
-    private int playerId;
-    private int teamId;
+
+    @Id
+    @Column(name = "name")
+    private String playerName;
+
+    @Column(name = "team_name")
+    private String teamName;
+
+    @Column(name = "opp")
     private String opponent;
+
+    @Column(name = "passingyds")
     private double passingYds;
+
+    @Column(name = "receivingyds")
     private double receivingYds;
+
+    @Column(name = "rushingyds")
     private double rushingYds;
 
     public GameLog() {}
-    public GameLog(double rushingYds, double receivingYds, double passingYds, String opponent, int playerId, int teamId, LocalDate date) {
+    public GameLog(double rushingYds, double receivingYds, double passingYds, String opponent, String playerId, String teamId, LocalDate date) {
         this.rushingYds = rushingYds;
         this.receivingYds = receivingYds;
         this.passingYds = passingYds;
         this.opponent = opponent;
-        this.playerId = playerId;
-        this.teamId = teamId;
+        this.playerName = playerId;
+        this.teamName = teamId;
         this.date = date;
     }
 
-    public void setTeamId(int teamId) {
-        this.teamId = teamId;
+    public void setTeamName(String teamId) {
+        this.teamName = teamId;
     }
 
     public LocalDate getDate() {
@@ -34,12 +55,12 @@ public class GameLog {
         this.date = date;
     }
 
-    public int getPlayerId() {
-        return playerId;
+    public String getPlayerName() {
+        return playerName;
     }
 
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
+    public void setPlayerName(String playerId) {
+        this.playerName = playerId;
     }
 
     public String getOpponent() {
@@ -74,7 +95,17 @@ public class GameLog {
         this.rushingYds = rushingYds;
     }
 
-    public int getTeamId() {
-        return teamId;
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public GameLogDTO ToDTO(){
+        return new GameLogDTO(
+                this.rushingYds,
+                this.receivingYds,
+                this.passingYds,
+                this.opponent,
+                this.playerName = playerName,
+                this.date);
     }
 }
