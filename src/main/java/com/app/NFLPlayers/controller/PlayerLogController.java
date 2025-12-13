@@ -4,28 +4,27 @@ import com.app.NFLPlayers.DTO.GameLogDTO;
 import com.app.NFLPlayers.DTO.PlayerDTO;
 import com.app.NFLPlayers.DTO.TeamDetailsDTO;
 import com.app.NFLPlayers.DTO.TeamTagDTO;
+import com.app.NFLPlayers.models.Player;
 import com.app.NFLPlayers.models.Team;
 import com.app.NFLPlayers.service.GameLogService;
 import com.app.NFLPlayers.service.PlayerService;
 import com.app.NFLPlayers.service.TeamService;
-import com.app.NFLPlayers.utility.ApiResponse;
+import com.app.NFLPlayers.utility.PlayerSpecs;
+import jakarta.persistence.criteria.Root;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PagedModel;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.Console;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("/home")
 public class PlayerLogController {
 
@@ -39,70 +38,68 @@ public class PlayerLogController {
         this.gameLogService = gs;
     }
 
-    @GetMapping("/test")
-    public String first(Model model){
-        List<PlayerDTO> list = new ArrayList<>();
-        list.add(new PlayerDTO(
-                "James",
-                null,
-                1,
-                "QB"
-        ));
-
-        list.add(new PlayerDTO(
-                "Smith",
-                null,
-                12,
-                "TE"
-        ));
-
-        list.add(new PlayerDTO(
-                "Norman",
-                null,
-                4,
-                "WR"
-        ));
-
-        model.addAttribute("playerList", list);
-
-        return "index";
+    @GetMapping
+    public String Home(){
+        return "playerView";
     }
 
-//    @GetMapping("/players")
-//    public String GetPlayers(@RequestParam(value = "name", required = false) String name,
-//                             @RequestParam(value = "number", required = false) Integer number,
-//                             @RequestParam(value = "position", required = false) String position,
-//                             Model model) {
-//
-//        List<PlayerDTO> list = null;
-//
-//        if (name != null){
-//            list = playerService.matchPlayersByName(name);
-//        }
-//        else if (number != null){
-//            list = playerService.matchPlayersByNumber(number);
-//        }
-//        else if (position != null){
-//            list = playerService.matchPlayersByPosition(position);
-//        }
-//
-//        if (list != null) {
-//
-//            if (!list.isEmpty()){
-//                model.addAttribute("players", list);
-//                return "index";
-//            }
-//
-//            //model add
-//            model.addAttribute("players", list);
-//            return "index";
-//        }
-//
-//        //If no Query-parameters
-//        list = playerService.getAllPlayers();
-//        model.addAttribute("players", list);
-//        return "index";
-//    }
+
+    @GetMapping("/players")
+    public String GetPlayers(@RequestParam(value = "name", required = false) String name,
+                             @RequestParam(value = "number", required = false) Integer number,
+                             @RequestParam(value = "position", required = false) String position,
+                             @RequestParam(value = "size",defaultValue = "5",required = false) Integer size,
+                             @RequestParam(value = "page",defaultValue = "0",required = false) Integer page,
+                             HttpServletRequest request,
+                             Model model) {
+
+        Page<PlayerDTO> pageResult = null;
+        PagedModel<PlayerDTO> pModel = null;
+
+        //Url
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(request.getRequestURI());
+        builder.query(request.getQueryString());
+
+
+        //Base filter
+        Specification<Player> spec = ((root, query, criteriaBuilder) -> null);
+
+        if (name != null && !name.isEmpty()){
+            spec = spec.and(PlayerSpecs.MatchLikeName(name));
+
+            //pageResult = playerService.matchPlayersByNamePaged(page,size,name);
+        }
+        else if (number != null){
+            spec = spec.and(PlayerSpecs.MatchNumber(number));
+
+            //pageResult = playerService.matchPlayersByNumberPaged(page,size,number);
+        }
+        else if (position != null && !position.isEmpty()){
+            spec = spec.and(PlayerSpecs.MatchLikePosition(position));
+
+            //pageResult = playerService.matchPlayersByPositionPaged(page,size,position);
+        }
+
+        pageResult = playerService.matchPlayerSpecs(spec, page, size);
+
+        if (pageResult.hasNext()) {
+            builder.queryParamIfPresent("page", Optional.of(page+1));
+            builder.replaceQueryParam("page", Optional.of(page+1));
+            model.addAttribute("nextPage", builder.toUriString());
+        }
+
+        if (pageResult.hasPrevious()) {
+            builder.queryParamIfPresent("page", Optional.of(page-1));
+            builder.replaceQueryParam("page", Optional.of(page-1));
+            model.addAttribute("prevPage", builder.toUriString());
+        }
+
+        pModel = new PagedModel<>(pageResult);
+        model.addAttribute("playerPage", pModel);
+        model.addAttribute("pageData", pageResult);
+        return "playerView";
+
+    }
 
     //RequestParam - Filter through data
     //PathVariable - Identifies specific resource (id)
@@ -110,27 +107,30 @@ public class PlayerLogController {
     @GetMapping("/teams")
     public String GetTeams(@RequestParam(value = "teamName",required = false) String teamName,
                            @RequestParam(value = "teamAbbreviation",required = false) String abbrev,
+                           @RequestParam(value = "size",defaultValue = "5",required = false) Integer size,
+                           @RequestParam(value = "page",defaultValue = "0",required = false) Integer page,
                            Model model) {
 
-        List<TeamTagDTO> list = null;
+        Page<TeamTagDTO> list = null;
+        PagedModel<TeamTagDTO> pModel = null;
 
         if (teamName != null) {
-            list = teamService.matchName(teamName);
+//            list = teamService.matchName(teamName);
         }
         else if (abbrev != null){
-            list = teamService.matchAbbreviation(abbrev);
+//            list = teamService.matchAbbreviation(abbrev);
         }
 
         if (list != null && !list.isEmpty()){
             model.addAttribute("teamList", list);
-            return "index";
+            return "playerView";
         }
 
         //If there are no RequestParams
-        list = teamService.getAllTeams();
+        list = teamService.getAllTeams(page, size);
         model.addAttribute("teamList", list);
 
-        return "index";
+        return "teamView";
     }
 
     @GetMapping("/team/{id}")
@@ -144,7 +144,7 @@ public class PlayerLogController {
         //model add
         TeamDetailsDTO details = team.get().ToDetailsDTO();
         model.addAttribute("selectedTeam", details);
-        return "index";
+        return "teamView";
     }
 
     @GetMapping("/gamelog")
@@ -153,10 +153,14 @@ public class PlayerLogController {
 
         List<GameLogDTO> list = gameLogService.getMatchingGameLogs(playerName);
         model.addAttribute("gamelogs", list);
-        return "index";
+        return "playerView";
     }
 
-    @GetMapping("/players")
+
+    //API-RestMethods
+    /*
+
+    @GetMapping("/players") - paginated
     public ResponseEntity<ApiResponse<PagedModel<PlayerDTO>>> GetPlayers(@RequestParam(value = "name", required = false) String name,
                                                                          @RequestParam(value = "number", required = false) Integer number,
                                                                          @RequestParam(value = "position", required = false) String position,
@@ -194,8 +198,6 @@ public class PlayerLogController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    //API-RestMethods
-    /*
     @GetMapping("/players")
     public ResponseEntity<ApiResponse<List<PlayerDTO>>> GetPlayers(@RequestParam(value = "name", required = false) String name,
                                                                    @RequestParam(value = "number", required = false) Integer number,

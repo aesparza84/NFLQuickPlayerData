@@ -1,0 +1,61 @@
+<!doctype html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NFL Stats - Home Page</title>
+</head>
+<body>
+<div id="heading">
+    <h2>Quick Player Stats</h2>
+</div>
+
+<form th:action="@{/home/teams}" method="get">
+    <div id="search-area">
+        <input type="text" name="searchVal" placeholder="Search...">
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+<div id="search-results" class="flex-results">
+
+    <!--Teams List render-->
+    <div th:if="${teamList != null}">
+        <div th:each="iterator:${teamList}">
+            <div>
+                <h2 th:text="${iterator.getName()}"></h2>
+                <p th:text="${iterator.getAbbreviation()}"></p>
+                <a th:href="@{/home/team/{id}(id=${iterator.getId()})}">Details</a>
+                <p>---------------------------------------</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Individual Team render-->
+    <div th:if="${selectedTeam != null}">
+        <h2 th:text="${selectedTeam.getName()}"></h2>
+        <h3 th:text="${selectedTeam.getAbbreviation()}"></h3>
+
+        <!--Player Collection-->
+        <div th:if="${selectedTeam.getPlayerSet() != null}">
+
+            <!--Each Player-->
+            <div th:each="player:${selectedTeam.getPlayerSet()}">
+                <p> <span th:text="${player.getName()}"></span>
+                    <span th:text="${player.getPosition()}"></span>
+                    <span th:text="${player.getNumber()}"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+</script>
+
+</body>
+</html>
