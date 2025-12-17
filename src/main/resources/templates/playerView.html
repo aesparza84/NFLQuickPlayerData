@@ -41,6 +41,8 @@
 
         <!--Player List render-->
         <div th:if="${playerPage.getContent() != null}">
+
+            <!--Player Render-->
             <div th:each="iterator:${playerPage.content}">
                 <div>
                     <h2 th:text="${iterator.getName()}"></h2>
@@ -51,9 +53,24 @@
                             th:text="${iterator.getTeam().getName()}"></a>
                     </p>
 
-                    <details>
-                        <summary>Info</summary>
-                    </details>
+                    <div th:if="${iterator.getGames() != null}">
+                        <details>
+                            <summary>Info</summary>
+                            <table>
+                                <tr>
+                                    <th>Passing Yds</th>
+                                    <th>Receiving Yds</th>
+                                    <th>Rushing Yds</th>
+                                </tr>
+
+                                <tr th:each="game:${iterator.getGames()}">
+                                    <td th:text="${game.getPassingYds()}"></td>
+                                    <td th:text="${game.getReceivingYds()}"></td>
+                                    <td th:text="${game.getRushingYds()}"></td>
+                                </tr>
+                            </table>
+                        </details>
+                    </div>
                     <p>---------------------------------------</p>
                 </div>
 
@@ -77,23 +94,6 @@
 
         </div>
 
-        <!--Game Log render-->
-        <div th:if="${gamelogs != null}">
-
-            <!--GameLog Collection-->
-            <div th:each="game : ${gamelogs}">
-
-                <!--Each Log-->
-                <div>
-                    <span th:text="${game.getDate()}"></span>
-                    <span th:text="${game.getOpponent()}"></span>
-                    <span th:text="${game.getPassingYds()}"></span>
-                    <span th:text="${game.getReceivingYds()}"></span>
-                    <span th:text="${game.getRushingYds()}"></span>
-                </div>
-
-            </div>
-        </div>
 
     </div>
 

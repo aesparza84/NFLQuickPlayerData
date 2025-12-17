@@ -3,6 +3,9 @@ package com.app.NFLPlayers.models;
 import com.app.NFLPlayers.DTO.PlayerDTO;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name="player_table")
 public class Player {
@@ -16,7 +19,7 @@ public class Player {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "team_id", referencedColumnName = "team_id")
+    @JoinColumn(name = "team_id", referencedColumnName = "team_id") //Creates a FK on team
     private Team team;
 
     @Column(name = "number")
@@ -25,6 +28,9 @@ public class Player {
     @Column(name = "position")
     private String position;
 
+    @OneToMany(mappedBy = "player")
+    private Set<GameLog> gameLogs = new HashSet<>();
+
     public Player(){}
     public Player(int id,String name, Team team, int number, String position) {
         this.id = id;
@@ -32,6 +38,18 @@ public class Player {
         this.team = team;
         this.number = number;
         this.position = position;
+    }
+
+    public Set<GameLog> getGameLogs() {
+        return gameLogs;
+    }
+
+    public void setGameLogs(Set<GameLog> gameLogs) {
+        this.gameLogs = gameLogs;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getName() {
@@ -70,13 +88,13 @@ public class Player {
         this.id = id;
     }
 
-    public PlayerDTO toDTO()
-    {
+    public PlayerDTO toDTO() {
         return new PlayerDTO(
-            this.name,
+            this.gameLogs,
             this.team.ToTagDTO(),
+            this.position,
             this.number,
-            this.position
+            this.name
         );
     }
 

@@ -6,22 +6,22 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@IdClass(GameLogId.class)
+@IdClass(GameLogKey.class)
 @Table(name = "football_main_table")
 public class GameLog {
     @Id
+    @Column(name = "name")
+    private String name;
+
+    @Id
+    @Column(name = "opp")
+    private String opposition;
+
     @Column(name = "date")
     private LocalDate date;
 
-    @Id
-    @Column(name = "name")
-    private String playerName;
-
     @Column(name = "team_name")
     private String teamName;
-
-    @Column(name = "opp")
-    private String opponent;
 
     @Column(name = "passingyds")
     private double passingYds;
@@ -32,15 +32,28 @@ public class GameLog {
     @Column(name = "rushingyds")
     private double rushingYds;
 
+    @ManyToOne
+    @JoinColumn(name = "name", referencedColumnName = "name")
+    private Player player;
+
     public GameLog() {}
-    public GameLog(double rushingYds, double receivingYds, double passingYds, String opponent, String playerId, String teamId, LocalDate date) {
+    public GameLog(Player player, double rushingYds, double receivingYds, double passingYds, String opponent, String name, String team, LocalDate date) {
+        this.player = player;
         this.rushingYds = rushingYds;
         this.receivingYds = receivingYds;
         this.passingYds = passingYds;
-        this.opponent = opponent;
-        this.playerName = playerId;
-        this.teamName = teamId;
+        this.opposition = opponent;
+        this.name = name;
+        this.teamName = team;
         this.date = date;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public void setTeamName(String teamId) {
@@ -55,20 +68,20 @@ public class GameLog {
         this.date = date;
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public String getName() {
+        return name;
     }
 
-    public void setPlayerName(String playerId) {
-        this.playerName = playerId;
+    public void setName(String playerId) {
+        this.name = playerId;
     }
 
-    public String getOpponent() {
-        return opponent;
+    public String getOpposition() {
+        return opposition;
     }
 
-    public void setOpponent(String opponent) {
-        this.opponent = opponent;
+    public void setOpposition(String opponent) {
+        this.opposition = opponent;
     }
 
     public double getPassingYds() {
@@ -104,8 +117,8 @@ public class GameLog {
                 this.rushingYds,
                 this.receivingYds,
                 this.passingYds,
-                this.opponent,
-                this.playerName = playerName,
+                this.opposition,
+                this.name,
                 this.date);
     }
 }

@@ -6,11 +6,9 @@ import com.app.NFLPlayers.DTO.TeamDetailsDTO;
 import com.app.NFLPlayers.DTO.TeamTagDTO;
 import com.app.NFLPlayers.models.Player;
 import com.app.NFLPlayers.models.Team;
-import com.app.NFLPlayers.service.GameLogService;
 import com.app.NFLPlayers.service.PlayerService;
 import com.app.NFLPlayers.service.TeamService;
 import com.app.NFLPlayers.utility.PlayerSpecs;
-import jakarta.persistence.criteria.Root;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,9 +16,9 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,12 +28,10 @@ public class PlayerLogController {
 
     private PlayerService playerService;
     private TeamService teamService;
-    private GameLogService gameLogService;
 
-    public PlayerLogController(PlayerService ps, TeamService ts, GameLogService gs){
+    public PlayerLogController(PlayerService ps, TeamService ts){
         this.playerService = ps;
         this.teamService = ts;
-        this.gameLogService = gs;
     }
 
     @GetMapping
@@ -81,6 +77,10 @@ public class PlayerLogController {
         }
 
         pageResult = playerService.matchPlayerSpecs(spec, page, size);
+        List<PlayerDTO> s = pageResult.getContent();
+
+        List<List<GameLogDTO>> logList = new ArrayList<>();
+
 
         if (pageResult.hasNext()) {
             builder.queryParamIfPresent("page", Optional.of(page+1));
@@ -146,16 +146,6 @@ public class PlayerLogController {
         model.addAttribute("selectedTeam", details);
         return "teamView";
     }
-
-    @GetMapping("/gamelog")
-    public String GetGameLog(@RequestParam(value = "name", required = true) String playerName,
-                             Model model) {
-
-        List<GameLogDTO> list = gameLogService.getMatchingGameLogs(playerName);
-        model.addAttribute("gamelogs", list);
-        return "playerView";
-    }
-
 
     //API-RestMethods
     /*
