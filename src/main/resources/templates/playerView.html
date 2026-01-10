@@ -1,0 +1,120 @@
+<!doctype html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NFL Stats - Home Page</title>
+</head>
+<body>
+<div id="heading">
+    <h2>Quick Player Stats</h2>
+</div>
+
+    <div id="search-type">
+        <a href="/home/teams">Teams</a>
+    </div>
+
+    <form id="player-form" th:action="@{/home/players}" method="get">
+        <div id="search-area">
+            <label for="nameVal">Name</label>
+            <input id="nameVal" type="text" name="name" placeholder="Search...">
+
+            <label for="positionVal">Position</label>
+            <select name="position" id="positionVal">
+                <option value=""></option>
+                <option value="QB">Quarterback</option>
+                <option value="WR">Wide Receiver</option>
+                <option value="RB">Running Back</option>
+                <option value="TE">Tight End</option>
+            </select>
+
+            <label for="numberVal">Number</label>
+            <input type="number" min="0" name="numberVal" id="numberVal">
+
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+
+    <div id="search-results" class="flex-results">
+
+        <div id="message-area">
+            <p th:text="${playerPage.getMetadata().totalElements()} + ' results found'"></p>
+        </div>
+
+        <!--Player List render-->
+        <div th:if="${playerPage.getContent() != null}">
+
+            <!--Player Render-->
+            <div th:each="iterator:${playerPage.content}">
+                <div>
+                    <h2 th:text="${iterator.getName()}"></h2>
+                    <p>
+                        <span th:text="${iterator.getNumber()}"></span>
+                        <span th:text="${iterator.getPosition()}"></span>
+                        <a  th:href="@{/home/team/{id}(id=${iterator.getTeam().getId()})}"
+                            th:text="${iterator.getTeam().getName()}"></a>
+                    </p>
+
+                    <div th:if="${iterator.getGames() != null}">
+                        <details>
+                            <summary>Info</summary>
+                            <table>
+                                <tr>
+                                    <th>Passing Yds</th>
+                                    <th>Receiving Yds</th>
+                                    <th>Rushing Yds</th>
+                                </tr>
+
+                                <tr th:each="game:${iterator.getGames()}">
+                                    <td th:text="${game.getPassingYds()}"></td>
+                                    <td th:text="${game.getReceivingYds()}"></td>
+                                    <td th:text="${game.getRushingYds()}"></td>
+                                </tr>
+                            </table>
+                        </details>
+                    </div>
+                    <p>---------------------------------------</p>
+                </div>
+
+
+            </div>
+
+            <div id="page-navigation">
+                <div th:if="${pageData.hasPrevious()}">
+                    <a th:href="${prevPage}"
+                       th:text="'<' + ${pageData.number - 1}"></a>
+                </div>
+
+                <p th:text="${pageData.number}"></p>
+
+                <div th:if="${pageData.hasNext()}">
+                    <a th:href="${nextPage}"
+                       th:text="${pageData.number + 1} + '>'"></a>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+<!--<script>-->
+<!--    document.getElementById("player-form").addEventListener("submit", function (e) {-->
+<!--        const params = new URLSearchParams();-->
+<!--        Array.from(this.elements).forEach(el => {-->
+<!--            if (el.name && el.value) {-->
+<!--                params.append(el.name,el.value);-->
+<!--            }-->
+<!--        });-->
+
+<!--        e.preventDefault();-->
+<!--        window.location = this.action + "?" +params.toString();-->
+
+<!--    });-->
+<!--</script>-->
+
+</body>
+</html>

@@ -1,17 +1,32 @@
 package com.app.NFLPlayers.DTO;
 
+import com.app.NFLPlayers.models.GameLog;
+
+import java.util.List;
+import java.util.Set;
+
 public class PlayerDTO {
     private String name;
     private int number;
     private String position;
     private TeamTagDTO team;
+    private List<GameLogDTO> games;
 
     public PlayerDTO(){}
-    public PlayerDTO(String name, TeamTagDTO team, int number, String position) {
-        this.name = name;
+    public PlayerDTO(Set<GameLog> games, TeamTagDTO team, String position, int number, String name) {
+        this.games = games.stream().map(g -> g.ToDTO()).toList();
         this.team = team;
-        this.number = number;
         this.position = position;
+        this.number = number;
+        this.name = name;
+    }
+
+    public List<GameLogDTO> getGames() {
+        return games;
+    }
+
+    public void setGames(Set<GameLog> games) {
+        this.games = games.stream().map(g -> g.ToDTO()).toList();
     }
 
     public String getName() {

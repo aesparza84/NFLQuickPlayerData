@@ -3,6 +3,7 @@ package com.app.NFLPlayers.service;
 import com.app.NFLPlayers.DTO.PlayerDTO;
 import com.app.NFLPlayers.models.Player;
 import com.app.NFLPlayers.utility.CommonSpecs;
+import com.app.NFLPlayers.utility.PlayerSpecs;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,41 +24,6 @@ public class PlayerService {
         this.repo = r;
     }
 
-    public List<PlayerDTO> getAllPlayers(){
-
-        return repo.findAll().stream().map(s -> s.toDTO()).toList();
-    }
-
-    public List<PlayerDTO> matchPlayersByName(String name){
-        if (name == null)
-            return new ArrayList<>();
-
-        Specification<PlayerDTO> specs =
-                CommonSpecs.MatchName("James","name");
-
-        return repo.findAllByNameContainsIgnoreCase(name).stream()
-                .map(p -> p.toDTO())
-                .toList();
-    }
-
-    public List<PlayerDTO> matchPlayersByNumber(Integer number){
-        if (number == null)
-            return new ArrayList<>();
-
-        return repo.findAllByNumber(number).stream()
-                .map(p -> p.toDTO())
-                .toList();
-    }
-
-    public List<PlayerDTO> matchPlayersByPosition(String position){
-        if (position == null)
-            return new ArrayList<>();
-
-        return repo.findAllByPositionContainsIgnoreCase(position).stream()
-                .map(p -> p.toDTO())
-                .toList();
-    }
-
     //<editor-fold desc="Pagination">
     public Page<PlayerDTO> getAllPlayersPaged(int pageNum, int pageSize){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
@@ -71,15 +37,11 @@ public class PlayerService {
         //Create the page instruction
         Pageable page = PageRequest.of(pageNum, pageSize);
 
-        //Pass pageable to repo
-        Page<Player> all = repo.findAll(page);
-
         //Filter via specs
-        Specification<PlayerDTO> specs =
-                CommonSpecs.MatchName(name,"name");
+//        Specification<Player> specs = PlayerSpecs.MatchLikeName(name);
+        Specification<Player> specs = PlayerSpecs.MatchLikeName(name);
 
-        return repo.findAllByNameContainsIgnoreCase(page, name)
-                .map(p -> p.toDTO());
+        return repo.findAll(specs, page).map(p -> p.toDTO());
     }
 
     public Page<PlayerDTO> matchPlayersByNumberPaged(int pageNum, int pageSize, Integer number){
@@ -89,7 +51,10 @@ public class PlayerService {
         //Instruction
         Pageable page = PageRequest.of(pageNum,pageSize);
 
-        return repo.findAllByNumber(page, number)
+        //Filter
+        Specification<Player> specs = PlayerSpecs.MatchNumber(number);
+
+        return repo.findAll(specs, page)
                 .map(p -> p.toDTO());
     }
 
@@ -100,10 +65,19 @@ public class PlayerService {
         //Instruction
         Pageable page = PageRequest.of(pageNum,pageSize);
 
-        return repo.findAllByPositionContainsIgnoreCase(page, position)
+        //Filter
+        Specification<Player> specs = PlayerSpecs.MatchLikePosition(position);
+
+        return repo.findAll(specs, page)
                 .map(p -> p.toDTO());
     }
     //</editor-fold>
+
+    public Page<PlayerDTO> matchPlayerSpecs(Specification<Player> specs, int pageNum, int pageSize) {
+        Pageable page = PageRequest.of(pageNum, pageSize);
+
+        return repo.findAll(specs, page).map(p -> p.toDTO());
+    }
 
     public PlayerDTO getPlayerById(int id){
         Optional<Player> p = repo.findById(id);

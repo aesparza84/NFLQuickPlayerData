@@ -19,8 +19,4 @@ import java.util.List;
 @Repository
 public interface TeamRepo extends JpaRepository<Team, Integer>, JpaSpecificationExecutor<Team>{
 
-
-    List<Team> findAllByNameContainsIgnoreCase(String name);
-
-    List<Team> findAllByAbbreviationContainsIgnoreCase(String abbreviation);
 }

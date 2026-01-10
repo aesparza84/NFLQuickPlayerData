@@ -5,14 +5,10 @@ import com.app.NFLPlayers.DTO.TeamTagDTO;
 import com.app.NFLPlayers.models.Player;
 import com.app.NFLPlayers.models.Team;
 import com.app.NFLPlayers.repository.TeamRepo;
-import com.app.NFLPlayers.utility.GameLogSpecs;
 import com.app.NFLPlayers.utility.TeamSpecs;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.servlet.Filter;
-import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -33,30 +29,35 @@ public class TeamService {
         this.repo = r;
     }
 
-    public List<TeamTagDTO> getAllTeams(){
-        return repo.findAll().stream()
-                .map(t -> t.ToTagDTO())
-                .toList();
+    public Page<TeamTagDTO> getAllTeams(int pageNum, int pageSize){
+
+        //Instruction
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+
+        return repo.findAll(pageable).map(t -> t.ToTagDTO());
     }
 
-    public List<TeamTagDTO> matchName(String name) {
-        if (name == null){
-            return new ArrayList<TeamTagDTO>();
-        }
+    public Page<TeamTagDTO> matchName(int pageNum, int pageSize, String name) {
 
+        //Instruction
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+
+        //Filter
         Specification<Team> specs = TeamSpecs.matchName(name);
 
-        return repo.findAll(specs).stream().map(t -> t.ToTagDTO()).toList();
+        return repo.findAll(specs, pageable).map(t -> t.ToTagDTO());
     }
 
-    public List<TeamTagDTO> matchAbbreviation(String abbrev) {
-        if (abbrev == null){
-            return new ArrayList<TeamTagDTO>();
-        }
+    public Page<TeamTagDTO> matchAbbreviation(int pageNum, int pageSize,String abbrev) {
 
-        return repo.findAllByAbbreviationContainsIgnoreCase(abbrev).stream()
-                .map(t -> t.ToTagDTO())
-                .toList();
+        //Instruction
+        Pageable page = PageRequest.of(pageNum, pageSize);
+
+        //Filter
+        Specification<Team> specs = TeamSpecs.matchAbbreviation(abbrev);
+
+        return repo.findAll(specs, page).map(t->t.ToTagDTO());
+
     }
 
     public Optional<Team> getTeamById(int id){
