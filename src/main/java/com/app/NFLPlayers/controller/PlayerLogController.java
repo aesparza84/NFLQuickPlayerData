@@ -6,6 +6,7 @@ import com.app.NFLPlayers.DTO.TeamDetailsDTO;
 import com.app.NFLPlayers.DTO.TeamTagDTO;
 import com.app.NFLPlayers.models.Player;
 import com.app.NFLPlayers.models.Team;
+import com.app.NFLPlayers.service.MainDataService;
 import com.app.NFLPlayers.service.PlayerService;
 import com.app.NFLPlayers.service.TeamService;
 import com.app.NFLPlayers.utility.PlayerSpecs;
@@ -28,15 +29,27 @@ public class PlayerLogController {
 
     private PlayerService playerService;
     private TeamService teamService;
+    private MainDataService sourceService;
 
-    public PlayerLogController(PlayerService ps, TeamService ts){
+    public PlayerLogController(PlayerService ps, TeamService ts, MainDataService ds){
         this.playerService = ps;
         this.teamService = ts;
+        this.sourceService = ds;
+    }
+
+    @GetMapping("/reset")
+    public String Reset(){
+        playerService.ClearData();
+        sourceService.ClearData();
+        return "playerView";
     }
 
     @GetMapping
     public String Home(){
-        return "playerView";
+        if (playerService.hasData())
+            return "playerView";
+
+        return "noDataView";
     }
 
 

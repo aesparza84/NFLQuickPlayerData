@@ -24,6 +24,15 @@ public class PlayerService {
         this.repo = r;
     }
 
+    public void ClearData(){
+        repo.truncatePlayerTable();
+        System.out.println("Truncated Player Table");
+    }
+
+    public Boolean hasData(){
+        return repo.count() > 1;
+    }
+
     //<editor-fold desc="Pagination">
     public Page<PlayerDTO> getAllPlayersPaged(int pageNum, int pageSize){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
