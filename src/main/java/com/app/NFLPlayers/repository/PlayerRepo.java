@@ -11,6 +11,8 @@ import java.util.List;
 @Transactional(readOnly = true)
 public interface PlayerRepo extends JpaRepository<Player, Integer>, JpaSpecificationExecutor<Player> {
 
+    Player findByName(String name);
+
     @Modifying
     @Transactional
     @NativeQuery(value = "TRUNCATE TABLE player_table RESTART IDENTITY")

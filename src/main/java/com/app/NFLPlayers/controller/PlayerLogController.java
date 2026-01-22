@@ -44,6 +44,13 @@ public class PlayerLogController {
         return "playerView";
     }
 
+    @GetMapping("/scraper")
+    public String GetScraperData(){
+        sourceService.CallScrape();
+
+        return "noDataView";
+    }
+
     @GetMapping
     public String Home(){
         if (playerService.hasData())
@@ -51,6 +58,7 @@ public class PlayerLogController {
 
         return "noDataView";
     }
+
 
 
     @GetMapping("/players")

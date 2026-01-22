@@ -33,7 +33,7 @@ public class GameLog {
     private double rushingYds;
 
     @ManyToOne
-    @JoinColumn(name = "name", referencedColumnName = "name")
+    @JoinColumn(name = "player_id", referencedColumnName = "player_id")
     private Player player;
 
     public GameLog() {}

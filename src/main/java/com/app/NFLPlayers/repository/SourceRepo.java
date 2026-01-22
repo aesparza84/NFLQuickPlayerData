@@ -16,4 +16,5 @@ public interface SourceRepo extends JpaRepository<GameLog, GameLogKey> {
     @Transactional
     @NativeQuery(value = "TRUNCATE TABLE football_main_table")
     void truncateMainTable();
+
 }

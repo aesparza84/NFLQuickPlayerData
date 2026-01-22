@@ -19,4 +19,5 @@ import java.util.List;
 @Repository
 public interface TeamRepo extends JpaRepository<Team, Integer>, JpaSpecificationExecutor<Team>{
 
+    Team findByName(String name);
 }
