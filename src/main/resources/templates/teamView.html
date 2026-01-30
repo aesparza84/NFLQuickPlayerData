@@ -12,18 +12,36 @@
     <h2>Quick Player Stats</h2>
 </div>
 
-<form th:action="@{/home/teams}" method="get">
+<div>
+    <a href="/home/players">Players</a>
+</div>
+
+
+<form id="team-form" th:action="@{/home/teams}" method="get">
     <div id="search-area">
-        <input type="text" name="searchVal" placeholder="Search...">
+        <label for="teamName">Team</label>
+        <input type="text" id="teamName" name="teamName" placeholder="Search...">
+
+        <label for="teamAbbreviation">Abbrev.</label>
+        <input type="text" id="teamAbbreviation" name="teamAbbreviation" placeholder="Search...">
+
         <button type="submit">Submit</button>
     </div>
 </form>
 
 <div id="search-results" class="flex-results">
 
+
     <!--Teams List render-->
-    <div th:if="${teamList != null}">
-        <div th:each="iterator:${teamList}">
+    <div th:if="${teamPage != null}">
+
+        <div id="message-area">
+            <p th:text="${pageData.getTotalElements()} + ' results found'"></p>
+        </div>
+
+        <!--Team Render-->
+        <div th:each="iterator:${teamPage.content}">
+
             <div>
                 <h2 th:text="${iterator.getName()}"></h2>
                 <p th:text="${iterator.getAbbreviation()}"></p>
@@ -31,9 +49,23 @@
                 <p>---------------------------------------</p>
             </div>
         </div>
+        <div id="page-navigation">
+            <div th:if="${pageData.hasPrevious()}">
+                <a th:href="${prevPage}"
+                   th:text="'<' + ${pageData.number - 1}"></a>
+            </div>
+
+            <p th:text="${pageData.number}"></p>
+
+            <div th:if="${pageData.hasNext()}">
+                <a th:href="${nextPage}"
+                   th:text="${pageData.number + 1} + '>'"></a>
+            </div>
+
+        </div>
     </div>
 
-    <!-- Individual Team render-->
+    <!-- Individual Team Details render-->
     <div th:if="${selectedTeam != null}">
         <h2 th:text="${selectedTeam.getName()}"></h2>
         <h3 th:text="${selectedTeam.getAbbreviation()}"></h3>
@@ -43,14 +75,36 @@
 
             <!--Each Player-->
             <div th:each="player:${selectedTeam.getPlayerSet()}">
-                <p> <span th:text="${player.getName()}"></span>
+                <h2 th:text="${player.getName()}"></h2>
+                <p>
                     <span th:text="${player.getPosition()}"></span>
                     <span th:text="${player.getNumber()}"></span>
                 </p>
+                <div th:if="${player.getGames() != null}">
+                    <details>
+                        <summary>Info</summary>
+                        <table>
+                            <tr>
+                                <th>Date</th>
+                                <th>Opp.</th>
+                                <th>Passing Yds</th>
+                                <th>Receiving Yds</th>
+                                <th>Rushing Yds</th>
+                            </tr>
+
+                            <tr th:each="game:${player.getGames()}">
+                                <td th:text="${game.getDate()}"></td>
+                                <td th:text="${game.getOpponent()}"></td>
+                                <td th:text="${game.getPassingYds()}"></td>
+                                <td th:text="${game.getReceivingYds()}"></td>
+                                <td th:text="${game.getRushingYds()}"></td>
+                            </tr>
+                        </table>
+                    </details>
+                </div>
             </div>
         </div>
     </div>
-
 </div>
 
 <script>

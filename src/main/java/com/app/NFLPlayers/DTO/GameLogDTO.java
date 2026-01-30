@@ -1,9 +1,12 @@
 package com.app.NFLPlayers.DTO;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Locale;
 
 public class GameLogDTO {
-    private LocalDate date;
+    private String date;
     private String playerName;
     private String opponent;
     private double passingYds;
@@ -17,14 +20,16 @@ public class GameLogDTO {
         this.passingYds = passingYds;
         this.opponent = opponent;
         this.playerName = playerName;
-        this.date = date;
+
+        SimpleDateFormat sd = new SimpleDateFormat("MM/dd", Locale.US);
+        this.date = sd.format(Date.valueOf(date));
     }
 
-    public LocalDate getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

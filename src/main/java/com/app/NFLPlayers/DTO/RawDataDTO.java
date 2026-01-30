@@ -124,7 +124,9 @@ public class RawDataDTO {
                 this.opponent,
                 this.name,
                 this.team,
-                LocalDate.parse(this.date)
+                LocalDate.parse(this.date),
+                this.number,
+                this.position
         );
     }
 }

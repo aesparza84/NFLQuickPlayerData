@@ -62,12 +62,16 @@
                             <summary>Info</summary>
                             <table>
                                 <tr>
+                                    <th>Date</th>
+                                    <th>Opp.</th>
                                     <th>Passing Yds</th>
                                     <th>Receiving Yds</th>
                                     <th>Rushing Yds</th>
                                 </tr>
 
                                 <tr th:each="game:${iterator.getGames()}">
+                                    <td th:text="${game.getDate()}"></td>
+                                    <td th:text="${game.getOpponent()}"></td>
                                     <td th:text="${game.getPassingYds()}"></td>
                                     <td th:text="${game.getReceivingYds()}"></td>
                                     <td th:text="${game.getRushingYds()}"></td>

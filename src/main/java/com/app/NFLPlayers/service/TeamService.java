@@ -60,6 +60,11 @@ public class TeamService {
 
     }
 
+    public Page<TeamTagDTO> matchTeamSpecs(Specification<Team> specs, int pageNum, int pageSize) {
+        Pageable page = PageRequest.of(pageNum, pageSize);
+        return repo.findAll(specs, page).map(t -> t.ToTagDTO());
+    }
+
     public Optional<Team> getTeamById(int id){
         return repo.findById(id);
     }

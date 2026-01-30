@@ -2,7 +2,6 @@ package com.app.NFLPlayers.service;
 
 import com.app.NFLPlayers.DTO.PlayerDTO;
 import com.app.NFLPlayers.models.Player;
-import com.app.NFLPlayers.utility.CommonSpecs;
 import com.app.NFLPlayers.utility.PlayerSpecs;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,8 +10,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import com.app.NFLPlayers.repository.PlayerRepo;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,11 +19,6 @@ public class PlayerService {
 
     public PlayerService(PlayerRepo r){
         this.repo = r;
-    }
-
-    public void ClearData(){
-        repo.truncatePlayerTable();
-        System.out.println("Truncated Player Table");
     }
 
     public Boolean hasData(){

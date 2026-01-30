@@ -17,6 +17,12 @@ public class GameLog {
     @Column(name = "opp")
     private String opposition;
 
+    @Column(name = "number")
+    private Integer number;
+
+    @Column(name = "pos")
+    private String pos;
+
     @Column(name = "date")
     private LocalDate date;
 
@@ -37,7 +43,7 @@ public class GameLog {
     private Player player;
 
     public GameLog() {}
-    public GameLog(Player player, double rushingYds, double receivingYds, double passingYds, String opponent, String name, String team, LocalDate date) {
+    public GameLog(Player player, double rushingYds, double receivingYds, double passingYds, String opponent, String name, String team, LocalDate date, Integer number, String pos) {
         this.player = player;
         this.rushingYds = rushingYds;
         this.receivingYds = receivingYds;
@@ -46,6 +52,8 @@ public class GameLog {
         this.name = name;
         this.teamName = team;
         this.date = date;
+        this.number = number;
+        this.pos = pos;
     }
 
     public Player getPlayer() {
@@ -54,6 +62,22 @@ public class GameLog {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public String getPos() {
+        return pos;
+    }
+
+    public void setPos(String pos) {
+        this.pos = pos;
     }
 
     public void setTeamName(String teamId) {

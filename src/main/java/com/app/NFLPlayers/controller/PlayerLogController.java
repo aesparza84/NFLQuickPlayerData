@@ -10,6 +10,7 @@ import com.app.NFLPlayers.service.MainDataService;
 import com.app.NFLPlayers.service.PlayerService;
 import com.app.NFLPlayers.service.TeamService;
 import com.app.NFLPlayers.utility.PlayerSpecs;
+import com.app.NFLPlayers.utility.TeamSpecs;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,6 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Controller
 @RequestMapping("/home")
@@ -37,16 +39,10 @@ public class PlayerLogController {
         this.sourceService = ds;
     }
 
-    @GetMapping("/reset")
-    public String Reset(){
-        playerService.ClearData();
-        sourceService.ClearData();
-        return "playerView";
-    }
-
     @GetMapping("/scraper")
     public String GetScraperData(){
-        sourceService.CallScrape();
+        sourceService.ClearTables();
+        CompletableFuture.runAsync(() ->sourceService.CallScrape());
 
         return "noDataView";
     }
@@ -83,7 +79,6 @@ public class PlayerLogController {
 
         if (name != null && !name.isEmpty()){
             spec = spec.and(PlayerSpecs.MatchLikeName(name));
-
             //pageResult = playerService.matchPlayersByNamePaged(page,size,name);
         }
         else if (number != null){
@@ -98,10 +93,6 @@ public class PlayerLogController {
         }
 
         pageResult = playerService.matchPlayerSpecs(spec, page, size);
-        List<PlayerDTO> s = pageResult.getContent();
-
-        List<List<GameLogDTO>> logList = new ArrayList<>();
-
 
         if (pageResult.hasNext()) {
             builder.queryParamIfPresent("page", Optional.of(page+1));
@@ -116,8 +107,8 @@ public class PlayerLogController {
         }
 
         pModel = new PagedModel<>(pageResult);
-        model.addAttribute("playerPage", pModel);
-        model.addAttribute("pageData", pageResult);
+        model.addAttribute("playerPage", pModel);   //Holds the actual pages to scroll through
+        model.addAttribute("pageData", pageResult); //HOlds the page content
         return "playerView";
 
     }
@@ -130,27 +121,45 @@ public class PlayerLogController {
                            @RequestParam(value = "teamAbbreviation",required = false) String abbrev,
                            @RequestParam(value = "size",defaultValue = "5",required = false) Integer size,
                            @RequestParam(value = "page",defaultValue = "0",required = false) Integer page,
+                           HttpServletRequest request,
                            Model model) {
 
-        Page<TeamTagDTO> list = null;
+        Page<TeamTagDTO> pageResult = null;
         PagedModel<TeamTagDTO> pModel = null;
 
-        if (teamName != null) {
-//            list = teamService.matchName(teamName);
+        //Grabs CURRENT Url - for page next/prev
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(request.getRequestURI());
+        builder.query(request.getQueryString());
+
+        //Base filter
+        Specification<Team> spec = ((root, query, criteriaBuilder) -> null);
+
+        if (teamName != null && !teamName.isEmpty()) {
+            //list = teamService.matchName(page, size, teamName);
+            spec = spec.and(TeamSpecs.matchName(teamName));
         }
-        else if (abbrev != null){
-//            list = teamService.matchAbbreviation(abbrev);
+        else if (abbrev != null && !abbrev.isEmpty()){
+            //list = teamService.matchAbbreviation(page, size, abbrev);
+            spec = spec.and(TeamSpecs.matchAbbreviation(abbrev));
         }
 
-        if (list != null && !list.isEmpty()){
-            model.addAttribute("teamList", list);
-            return "playerView";
+        pageResult = teamService.matchTeamSpecs(spec,page, size);
+
+        if (pageResult.hasNext()) {
+            builder.queryParamIfPresent("page", Optional.of(page+1));
+            builder.replaceQueryParam("page", Optional.of(page+1));
+            model.addAttribute("nextPage", builder.toUriString());
         }
 
-        //If there are no RequestParams
-        list = teamService.getAllTeams(page, size);
-        model.addAttribute("teamList", list);
+        if (pageResult.hasPrevious()) {
+            builder.queryParamIfPresent("page", Optional.of(page-1));
+            builder.replaceQueryParam("page", Optional.of(page-1));
+            model.addAttribute("prevPage", builder.toUriString());
+        }
 
+        pModel = new PagedModel<>(pageResult);
+        model.addAttribute("teamPage", pModel);   //Holds the actual pages to scroll through
+        model.addAttribute("pageData", pageResult); //HOlds the page content
         return "teamView";
     }
 

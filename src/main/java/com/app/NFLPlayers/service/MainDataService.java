@@ -17,6 +17,9 @@ import java.io.*;
 @Service
 public class MainDataService {
 
+    /// Bool to check whether scrape is vurrently scraping
+    private boolean isRunning = false;
+
     private SourceRepo mainRepo;
     private PlayerRepo playerRepo;
     private TeamRepo teamRepo;
@@ -27,12 +30,23 @@ public class MainDataService {
         this.teamRepo = teamRepo;
     }
 
-    public void ClearData() {
-        mainRepo.truncateMainTable();
-        System.out.println("Truncated main source table");
+    public void ClearTables() {
+        if (isRunning) {
+            System.out.println("Scrape currently running");
+            return;
+        }
+
+        playerRepo.truncateCascadePlayerTable();
     }
 
     public void CallScrape() {
+        if (isRunning) {
+            System.out.println("Scrape currently running");
+            return;
+        }
+
+        isRunning = true;
+
         RestTemplate restTemplate = new RestTemplate();
         String scrapeURL = "http://localhost:8000/scrape";
         ObjectMapper mapper = new ObjectMapper();
@@ -42,9 +56,6 @@ public class MainDataService {
                 HttpMethod.GET,
                 null,
                 response -> {
-                    if (!response.getStatusCode().is2xxSuccessful()) {
-                        throw new IllegalStateException("Python API error: "+response.getStatusCode());
-                    }
 
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.getBody()))){
                         String line;
@@ -64,6 +75,8 @@ public class MainDataService {
                     return null;
                 }
         );
+
+        isRunning = false;
     }
 
     private Player SavePlayer(RawDataDTO dto) {
