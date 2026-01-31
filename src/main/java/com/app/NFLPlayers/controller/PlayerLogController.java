@@ -4,6 +4,7 @@ import com.app.NFLPlayers.DTO.GameLogDTO;
 import com.app.NFLPlayers.DTO.PlayerDTO;
 import com.app.NFLPlayers.DTO.TeamDetailsDTO;
 import com.app.NFLPlayers.DTO.TeamTagDTO;
+import com.app.NFLPlayers.exceptions.TeamNotFoundException;
 import com.app.NFLPlayers.models.Player;
 import com.app.NFLPlayers.models.Team;
 import com.app.NFLPlayers.service.MainDataService;
@@ -11,6 +12,7 @@ import com.app.NFLPlayers.service.PlayerService;
 import com.app.NFLPlayers.service.TeamService;
 import com.app.NFLPlayers.utility.PlayerSpecs;
 import com.app.NFLPlayers.utility.TeamSpecs;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.thymeleaf.exceptions.TemplateInputException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,7 +172,7 @@ public class PlayerLogController {
         Optional<Team> team = teamService.getTeamById(id);
 
         if (team.isEmpty())
-            return null;
+            throw new TeamNotFoundException("Team id not found: "+id);
 
         //model add
         TeamDetailsDTO details = team.get().ToDetailsDTO();
