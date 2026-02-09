@@ -84,12 +84,14 @@ public class PlayerLogController {
             spec = spec.and(PlayerSpecs.MatchLikeName(name));
             //pageResult = playerService.matchPlayersByNamePaged(page,size,name);
         }
-        else if (number != null){
+
+        if (number != null){
             spec = spec.and(PlayerSpecs.MatchNumber(number));
 
             //pageResult = playerService.matchPlayersByNumberPaged(page,size,number);
         }
-        else if (position != null && !position.isEmpty()){
+
+        if (position != null && !position.isEmpty()){
             spec = spec.and(PlayerSpecs.MatchLikePosition(position));
 
             //pageResult = playerService.matchPlayersByPositionPaged(page,size,position);

@@ -5,107 +5,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/pageStyle.css">
     <title>NFL Stats - Home Page</title>
 </head>
 <body>
-<div id="heading">
-    <h2>Quick Player Stats</h2>
-</div>
 
-    <div id="search-type">
-        <a href="/home/teams">Teams</a>
-    </div>
+<div class="page-grid">
+    <div class="main-content-grid">
+        <header>
+            <div class="page-header" id="heading">
+                <h1>Quick Player Stats</h1>
+                <nav>
+                    <a href="/home/players">Players</a>
+                    <a href="/home/teams">Teams</a>
+                </nav>
+            </div>
+        </header>
 
-    <form id="player-form" th:action="@{/home/players}" method="get">
-        <div id="search-area">
-            <label for="nameVal">Name</label>
-            <input id="nameVal" type="text" name="name" placeholder="Search...">
+        <form class="search-form" id="player-form" th:action="@{/home/players}" method="get">
+            <div class="search-form-elements" id="search-area">
+                <label for="nameVal"></label>
+                <input id="nameVal" type="text" name="name" placeholder="Name...">
 
-            <label for="positionVal">Position</label>
-            <select name="position" id="positionVal">
-                <option value=""></option>
-                <option value="QB">Quarterback</option>
-                <option value="WR">Wide Receiver</option>
-                <option value="RB">Running Back</option>
-                <option value="TE">Tight End</option>
-            </select>
+                <label for="positionVal"></label>
+                <select name="position" id="positionVal">
+                    <option value="">Position</option>
+                    <option value="QB">Quarterback</option>
+                    <option value="WR">Wide Receiver</option>
+                    <option value="RB">Running Back</option>
+                    <option value="TE">Tight End</option>
+                </select>
 
-            <label for="numberVal">Number</label>
-            <input type="number" min="0" name="numberVal" id="numberVal">
+                <label for="number"></label>
+                <input type="number" min="0" name="number" id="number" placeholder="Number">
 
-            <button type="submit">Submit</button>
-        </div>
-    </form>
+                <button type="submit">Submit</button>
+            </div>
 
-    <div id="search-results" class="flex-results">
+        </form>
 
-        <div id="message-area">
-            <p th:text="${playerPage.getMetadata().totalElements()} + ' results found'"></p>
-        </div>
+        <div id="search-results" class="search-results">
 
-        <!--Player List render-->
-        <div th:if="${playerPage.getContent() != null}">
+            <!-- Reults found num -->
+            <div id="message-area" class="search-message">
+                <p th:text="${playerPage.getMetadata().totalElements()} + ' results found'"></p>
+            </div>
 
-            <!--Player Render-->
-            <div th:each="iterator:${playerPage.content}">
-                <div>
-                    <h2 th:text="${iterator.getName()}"></h2>
-                    <p>
-                        <span th:text="${iterator.getNumber()}"></span>
-                        <span th:text="${iterator.getPosition()}"></span>
+            <div class="search-buttons">
+                <button id="view-all">View All</button>
+                <button id="close-all">Close All</button>
+            </div>
+
+            <div class="search-results-container" th:if="${playerPage.getContent() != null}">
+                <div class="player-card" th:each="iterator:${playerPage.content}">
+                    <div class="player-card-content">
+                        <div class="player-card-header">
+                            <div class="player-card-header-name">
+                                <p class="player-name" th:text="${iterator.getName()}"></p>
+                                <p class="player-number" th:text="${iterator.getNumber()}"></p>
+                            </div>
+                            <p class="player-pos" th:text="${iterator.getPosition()}"></p>
+
+                        </div>
+
                         <a  th:href="@{/home/team/{id}(id=${iterator.getTeam().getId()})}"
                             th:text="${iterator.getTeam().getName()}"></a>
-                    </p>
 
-                    <div th:if="${iterator.getGames() != null}">
-                        <details>
-                            <summary>Info</summary>
-                            <table>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Opp.</th>
-                                    <th>Passing Yds</th>
-                                    <th>Receiving Yds</th>
-                                    <th>Rushing Yds</th>
-                                </tr>
+                        <div th:if="${iterator.getGames() != null}">
+                            <details>
+                                <summary>Info</summary>
+                                <table>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Opp.</th>
+                                        <th>Passing</th>
+                                        <th>Receiving</th>
+                                        <th>Rushing</th>
+                                    </tr>
 
-                                <tr th:each="game:${iterator.getGames()}">
-                                    <td th:text="${game.getDate()}"></td>
-                                    <td th:text="${game.getOpponent()}"></td>
-                                    <td th:text="${game.getPassingYds()}"></td>
-                                    <td th:text="${game.getReceivingYds()}"></td>
-                                    <td th:text="${game.getRushingYds()}"></td>
-                                </tr>
-                            </table>
-                        </details>
+                                    <tr th:each="game:${iterator.getGames()}">
+                                        <td th:text="${game.getDate()}"></td>
+                                        <td th:text="${game.getOpponent()}"></td>
+                                        <td th:text="${game.getPassingYds()}"></td>
+                                        <td th:text="${game.getReceivingYds()}"></td>
+                                        <td th:text="${game.getRushingYds()}"></td>
+                                    </tr>
+                                </table>
+                            </details>
+                        </div>
                     </div>
-                    <p>---------------------------------------</p>
                 </div>
-
-
             </div>
-
-            <div id="page-navigation">
-                <div th:if="${pageData.hasPrevious()}">
-                    <a th:href="${prevPage}"
-                       th:text="'<' + ${pageData.number - 1}"></a>
-                </div>
-
-                <p th:text="${pageData.number}"></p>
-
-                <div th:if="${pageData.hasNext()}">
-                    <a th:href="${nextPage}"
-                       th:text="${pageData.number + 1} + '>'"></a>
-                </div>
-
-            </div>
-
         </div>
 
+        <div id="page-navigation" class="page-selector">
+            <div th:if="${pageData.hasPrevious()}">
+                <a th:href="${prevPage}"
+                   th:text="${pageData.number - 1}">
+                </a>
+            </div>
 
+            <p th:text="${pageData.number}"></p>
+
+            <div th:if="${pageData.hasNext()}">
+                <a th:href="${nextPage}"
+                   th:text="${pageData.number + 1}"></a>
+            </div>
+        </div>
     </div>
 
+    <script>
+        document.getElementById("view-all").addEventListener("click", () => {
+            document.querySelectorAll("details").forEach(x=>x.open=true);
+        })
 
-
+        document.getElementById("close-all").addEventListener("click", ()=>{
+            document.querySelectorAll("details").forEach(x=>x.open=false);
+        })
+    </script>
+</div>
 </body>
 </html>

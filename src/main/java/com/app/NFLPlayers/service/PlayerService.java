@@ -39,7 +39,6 @@ public class PlayerService {
         Pageable page = PageRequest.of(pageNum, pageSize);
 
         //Filter via specs
-//        Specification<Player> specs = PlayerSpecs.MatchLikeName(name);
         Specification<Player> specs = PlayerSpecs.MatchLikeName(name);
 
         return repo.findAll(specs, page).map(p -> p.toDTO());
