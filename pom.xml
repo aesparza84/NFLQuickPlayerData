@@ -11,8 +11,8 @@
     <groupId>com.example</groupId>
     <artifactId>demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>demo</name>
-    <description>Demo project for Spring Boot</description>
+    <name>NFL-PlayerStats</name>
+    <description>App for quick access player stats</description>
     <url/>
     <licenses>
         <license/>
@@ -76,6 +76,7 @@
     </dependencies>
 
     <build>
+        <finalName>NFL-PlayerStats</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

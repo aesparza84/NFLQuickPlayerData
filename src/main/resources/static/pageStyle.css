@@ -140,7 +140,7 @@ button:hover {
 
 .search-form input:focus,
 .search-form select:focus {
-    border-color: #997127;
+    border-color: var(--mainCol);
     box-shadow: 0 0 0 3px rgba(156, 55, 9, 0.25);
 }
 

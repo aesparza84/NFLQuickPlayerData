@@ -14,6 +14,8 @@ import com.app.NFLPlayers.utility.PlayerSpecs;
 import com.app.NFLPlayers.utility.TeamSpecs;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.web.PagedModel;
@@ -21,10 +23,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.thymeleaf.exceptions.TemplateInputException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -36,14 +35,24 @@ public class PlayerLogController {
     private TeamService teamService;
     private MainDataService sourceService;
 
+    private final Logger logger = LoggerFactory.getLogger(PlayerLogController.class);
+
     public PlayerLogController(PlayerService ps, TeamService ts, MainDataService ds){
         this.playerService = ps;
         this.teamService = ts;
         this.sourceService = ds;
     }
 
+    @GetMapping("/test")
+    public String test(){
+        sourceService.CallScrape();
+
+        return "noDataView";
+    }
+
     @GetMapping("/scraper")
     public String GetScraperData(){
+        logger.debug("Scrape API called");
         sourceService.ClearTables();
         CompletableFuture.runAsync(() ->sourceService.CallScrape());
 

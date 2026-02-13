@@ -3,6 +3,8 @@ package com.app.NFLPlayers.service;
 import com.app.NFLPlayers.DTO.PlayerDTO;
 import com.app.NFLPlayers.models.Player;
 import com.app.NFLPlayers.utility.PlayerSpecs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,8 @@ public class PlayerService {
     public Boolean hasData(){
         return repo.count() > 1;
     }
+
+    private final Logger logger = LoggerFactory.getLogger(PlayerService.class);
 
     //<editor-fold desc="Pagination">
     public Page<PlayerDTO> getAllPlayersPaged(int pageNum, int pageSize){
@@ -75,17 +79,16 @@ public class PlayerService {
 
     public Page<PlayerDTO> matchPlayerSpecs(Specification<Player> specs, int pageNum, int pageSize) {
         Pageable page = PageRequest.of(pageNum, pageSize);
+        logger.debug(">>> Creating pageable: {}",page);
+        logger.debug(">>> Searching Player repo");
 
-        return repo.findAll(specs, page).map(p -> p.toDTO());
+        try {
+            Page<PlayerDTO> res = repo.findAll(specs, page).map(p -> p.toDTO());
+            return res;
+        } catch (Exception e) {
+            logger.warn("Can not reach database: {}", e.getMessage());
+        }
+
+        return Page.empty();
     }
-
-    public PlayerDTO getPlayerById(int id){
-        Optional<Player> p = repo.findById(id);
-
-        if (p.isPresent())
-            return p.get().toDTO();
-
-        return new PlayerDTO();
-    }
-
 }
