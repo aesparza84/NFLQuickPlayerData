@@ -73,7 +73,7 @@ public class PlayerLogController {
     public String GetPlayers(@RequestParam(value = "name", required = false) String name,
                              @RequestParam(value = "number", required = false) Integer number,
                              @RequestParam(value = "position", required = false) String position,
-                             @RequestParam(value = "size",defaultValue = "5",required = false) Integer size,
+                             @RequestParam(value = "size",defaultValue = "6",required = false) Integer size,
                              @RequestParam(value = "page",defaultValue = "0",required = false) Integer page,
                              HttpServletRequest request,
                              Model model) {
