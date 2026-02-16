@@ -8,5 +8,5 @@ RUN mvn clean package -DskipTests
 #Run jar
 FROM eclipse-temurin:25-jdk
 WORKDIR /app
-ADD target/NFL-PlayerStats.jar NFL-PlayerStats.jar
-ENTRYPOINT ["java","-jar","/NFL-PlayerStats.jar"]
+COPY target/NFL-PlayerStats.jar runnableApp.jar
+ENTRYPOINT ["java","-jar","runnableApp.jar"]
