@@ -54,7 +54,8 @@ public class MainDataService {
         isRunning = true;
 
         RestTemplate restTemplate = new RestTemplate();
-        String scrapeURL = "http://scraper:8000/scrape";
+//        String scrapeURL = "http://scraper:8000/scrape";
+        String scrapeURL = "http://localhost:8000/scrape";
         ObjectMapper mapper = new ObjectMapper();
 
         logger.info(">>> Calling scrape FastAPI");
