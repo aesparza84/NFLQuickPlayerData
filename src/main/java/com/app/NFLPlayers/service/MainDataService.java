@@ -9,6 +9,7 @@ import com.app.NFLPlayers.repository.SourceRepo;
 import com.app.NFLPlayers.repository.TeamRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,6 +26,9 @@ public class MainDataService {
     private SourceRepo mainRepo;
     private PlayerRepo playerRepo;
     private TeamRepo teamRepo;
+
+    @Value("${SCRAPER_URL}")
+    private String scrapeURL;
 
     private final Logger logger = LoggerFactory.getLogger(MainDataService.class);
 
@@ -55,7 +59,7 @@ public class MainDataService {
 
         RestTemplate restTemplate = new RestTemplate();
 //        String scrapeURL = "http://scraper:8000/scrape";
-        String scrapeURL = "http://localhost:8000/scrape";
+//        String scrapeURL = "http://localhost:8000/scrape";
         ObjectMapper mapper = new ObjectMapper();
 
         logger.info(">>> Calling scrape FastAPI");
