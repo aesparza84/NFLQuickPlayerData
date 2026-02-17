@@ -43,11 +43,9 @@ public class PlayerLogController {
         this.sourceService = ds;
     }
 
-    @GetMapping("/test")
-    public String test(){
-        sourceService.CallScrape();
-
-        return "noDataView";
+    @GetMapping
+    public String Home(){
+        return "redirect:/home/players";
     }
 
     @GetMapping("/scraper")
@@ -58,15 +56,6 @@ public class PlayerLogController {
 
         return "noDataView";
     }
-
-    @GetMapping
-    public String Home(){
-        if (playerService.hasData())
-            return "playerView";
-
-        return "noDataView";
-    }
-
 
 
     @GetMapping("/players")
